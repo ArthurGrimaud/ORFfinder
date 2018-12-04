@@ -6,6 +6,15 @@
 
 
 
+
+
+def atgFinder(seq, readingFrame=1):
+    strandStartCodon=[]
+    for pos in range(readingFrame,len(seq),3):
+        if Is_codon_start(seq,pos):
+            strandStartCodon.append(pos)
+    return strandStartCodon
+
 def readFasta(file):
     fastaSeq = {}
 
