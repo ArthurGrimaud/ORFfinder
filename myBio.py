@@ -7,7 +7,42 @@
 
 
 
+def display(S1coor,S2coor,S3coor,sequence):
+    allStrandCoor = [S1coor,S2coor,S3coor]
+    seqLine = ""
+    for strandCoor in allStrandCoor:
+        for j in range(len(sequence)):
+            done = False
+            for coor in strandCoor:
+                if coor[0] < j < coor[1] and done == False:
+                    seqLine = seqLine + sequence[j]
+                    done = True
+                elif done == False:
+                    seqLine = seqLine + "-"
+                    done = True
+        print(seqLine)
+        seqLine = ""
 
+    print(sequence)
+
+
+
+def coorToSequence(coor,sequence):
+    seqGene = ""
+    for n in range(coor[0],coor[1]+3):
+        seqGene = seqGene + sequence[n]
+    return seqGene
+
+
+
+
+def orfFilter(orfCoorList,sequence,minLength = 10,maxLength = 1500):
+    orfCoorFiltered = []
+    for coor in range(len(orfCoorList)):
+        if minLength < orfCoorList[coor][1]-orfCoorList[coor][0] < maxLength:
+            orfCoorFiltered.append(orfCoorList[coor])
+
+    return orfCoorFiltered
 
 
 

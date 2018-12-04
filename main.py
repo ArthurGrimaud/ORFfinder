@@ -1,7 +1,6 @@
 from myBio import *
 
 seqTest = "cgttgtatgcgtgtgacgtactgtgtgatgcggcgttgacggtgtgtcgtaggctatgagctagtggtcgaatgggcatgcgctcgcgacgctgcactcgcagcgtcgacgctgcagctgcatgcgttggggacagaatgcatgccgctgcagctgcagtcgc"
-seqTestNeg = Anti_sens(seqTest)
 
 
 
@@ -21,3 +20,13 @@ posStrand3orfCoor = coordOrfFinder(posStrand3StartCodon,posStrand3StopCodon)
 print(posStrand1orfCoor)
 print(posStrand2orfCoor)
 print(posStrand3orfCoor)
+
+print(orfFilter(posStrand1orfCoor,seqTest))
+print(orfFilter(posStrand2orfCoor,seqTest))
+print(orfFilter(posStrand3orfCoor,seqTest))
+
+posStrand3orfCoorFiltered = orfFilter(posStrand3orfCoor,seqTest)
+
+# print(coorToSequence(posStrand3orfCoorFiltered[0],seqTest))
+
+display(posStrand1orfCoor,posStrand2orfCoor,posStrand3orfCoor,seqTest)
