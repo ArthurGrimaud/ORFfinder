@@ -1,3 +1,4 @@
+# coding: utf-8
 #Projet OBI 12/18
 #jeremy bulle / arthur grimaud
 #Librairie pour creation du programme ORF finder
@@ -43,7 +44,6 @@ def orfFilter(orfCoorList,sequence,minLength = 10,maxLength = 1500):
             orfCoorFiltered.append(orfCoorList[coor])
 
     return orfCoorFiltered
-
 
 
 def coordOrfFinder(startPos,stopPos):
