@@ -7,6 +7,9 @@
 
 
 def readFasta(file):
+    """ lit un fichier fasta et crée un dict avec le nom des genes en tant que clé
+    les nom des genes doit etre précédé par un >,
+    tout ce qui suit après le premier retour à la ligne est considéré comme seq"""
     fastaSeq = {}
 
     file=open(file,"r")
@@ -19,7 +22,10 @@ def readFasta(file):
     return fastaSeq
 
 def Write_fasta(Dict_seq,seq,filename,x=2):
-    """ 4e arg defautl = 2, brin sens et anti-sens de copier, si x !=2, uniquement brin sens"""
+    """ ajoute à la fin du fichier, le contenu du dict de gène. la clé doit etre
+    un nom de gène et le contenu une seq au format fasta
+    le 4e arg(x), valeur par défault = 2, brin sens et anti-sens de copier
+    si x !=2, uniquement brin sens"""
     chemin = "./"+filename
     fic = open(chemin)
     contenu_fic = fic.read()
@@ -72,18 +78,20 @@ def enter_seq():
     for i in range (len(adn) ):
         print("i:␣", i, "->" , adn[i])
 
-def Compte_aa(prot):
+def Compte_aa(seq_prot):
+    """compte le nombre d'apparition d'un AA donné dans la séquence d'une prot"""
     print("quel AA?")
     aa = input()
     nb_aa = 0
     aa = aa.upper()
-    for i in protein:
+    for i in seq_prot:
         if i == aa :
             nb_aa = nb_aa + 1
     return nb_aa
     print ("il␣y␣a␣" , Compte_aa(protein) , "␣Cysteine(s)")
 
 def Compte_all_aa(seq_prot):
+    "affiche le nombre d'apparition de chaque AA dans une seq prot"
     List_aa =["E","D","A","R","N","C","Q","G","H","I","L","K","M","F","P","S","T","W","Y","V"]
     for i in List_aa :
         Nb_aa = 0
@@ -94,6 +102,7 @@ def Compte_all_aa(seq_prot):
 
 
 def Is_dna(adn):
+    """retourne tru si la sequence entree est une sequence d adn """
     seq = ""
     for i in adn:
         i = i.upper()
@@ -110,6 +119,10 @@ def Is_dna(adn):
         return True
 
 def One_word(seq, start,wlen):
+    """seq est une string entrée, start est l'index de départ du mot
+    dans la string
+    wlen est un entier qui détermine la longueure du mot recherché
+    One_word retourne le mot trouvé"""
     s=""
     j = 0
     num = start
@@ -123,6 +136,10 @@ def One_word(seq, start,wlen):
     return s
 
 def Count_word(seq, word):
+    """ seq est une string entrée, word est une string qui est recherchéen dans
+    la seq
+    Count_word retourne le nombre d'occurence de word dans la séquence et dans
+    tous les cadres de lecture"""
     word = word.upper()
     wlen = len(word)
     flag = 0
@@ -179,8 +196,5 @@ def Anti_sens(dict_seq,seq_name):
 
 if __name__ == '__main__':
 
-    Dict = Read_fasta("seqalone.txt")
-    print (Dict)
-    bla = Dict[">gi|28302128|ref|NM_000518.4| Homo sapiens hemoglobin subunit beta (HBB), mRNA"]
-    print(bla)
-    Write_fasta(Dict,">gi|28302128|ref|NM_000518.4| Homo sapiens hemoglobin subunit beta (HBB), mRNA","seqalonetest.txt")
+    test = "AATAACTT"
+    Count_word(test,"AA")
