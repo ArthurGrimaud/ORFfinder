@@ -1,7 +1,7 @@
+# coding: utf-8
 #Projet OBI 12/18
 #jeremy bulle / arthur grimaud
 #Librairie pour creation du programme ORF finder
-
 
 
 
