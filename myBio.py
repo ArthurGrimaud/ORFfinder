@@ -18,13 +18,16 @@ def readFasta(file):
             fastaSeq[nameLine] = fastaSeq[nameLine] + line.replace("\n","")
     return fastaSeq
 
-def Write_fasta(Dict_seq,seq,filename):
+def Write_fasta(Dict_seq,seq,filename,x=2):
+    """ 4e arg defautl = 2, brin sens et anti-sens de copier, si x !=2, uniquement brin sens"""
     chemin = "./"+filename
     fic = open(chemin)
     contenu_fic = fic.read()
-    brin_anti = Anti_sens(Dict_seq,seq)
-    new_contenu = contenu_fic + "\n" + seq + '\n'+ Dict_seq[seq] + "\n" + seq + " " + "anti-sens" +'\n'+ brin_anti
-    fic= open(chemin,"w")
+    if x == 2 :
+        brin_anti = Anti_sens(Dict_seq,seq)
+        new_contenu = contenu_fic + "\n" + seq + '\n'+ Dict_seq[seq] + "\n" + seq + " " + "anti-sens" +'\n'+ brin_anti
+    if x is not 2 :
+        new_contenu = contenu_fic + "\n" + seq + '\n'+ Dict_seq[seq]
     fic.write(new_contenu)
     fic.close()
 
