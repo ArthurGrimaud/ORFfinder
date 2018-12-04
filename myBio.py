@@ -6,6 +6,39 @@
 
 
 
+
+
+
+
+def coordOrfFinder(startPos,stopPos):
+    orfCoor = []
+    for start in startPos:
+        oneCoor = ()
+        found = False
+        for stop in stopPos:
+            if start < stop and found == False:
+                oneCoor = (start,stop)
+                orfCoor.append(oneCoor)
+                found = True
+    return orfCoor
+
+
+
+def startStopFinder(seq, readingFrame=1, codon = "start" ):
+    strandCodon=[]
+    if codon == "start":
+        for pos in range(readingFrame,len(seq),3):
+            if Is_codon_start(seq,pos):
+                strandCodon.append(pos)
+        return strandCodon
+    elif codon =="stop":
+        for pos in range(readingFrame,len(seq),3):
+            if Is_codon_stop(seq,pos):
+                strandCodon.append(pos)
+        return strandCodon
+    else:
+        print("invalid codon argument (please enter: start or stop)")
+
 def readFasta(file):
     """ lit un fichier fasta et crée un dict avec le nom des genes en tant que clé
     les nom des genes doit etre précédé par un >,
