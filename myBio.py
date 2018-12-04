@@ -10,6 +10,7 @@
 
 
 
+
 def coordOrfFinder(startPos,stopPos):
     orfCoor = []
     for start in startPos:
