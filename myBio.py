@@ -4,18 +4,32 @@
 #Librairie pour creation du programme ORF finder
 
 
+def getAllOrfCoor(sequenceDic,sequenceName): #retourne une liste de listes de coordonnées
+    allCoor = []
+    sequence = sequenceDic[sequenceName]             #au format [S+1,S+2,S+3,S-1,S-2,S-3] (S = strand)
+    sequenceRev = Anti_sens(sequenceDic,sequenceName)
+    for i in range(1,4): #pour les 3 ORF des brins positifs
+        print(coordOrfFinder(startStopFinder(sequence,i),startStopFinder(sequence,i,codon="stop")))
+        allCoor.append(coordOrfFinder(startStopFinder(sequence,i),startStopFinder(sequence,i,codon="stop")))
+    for i in range(1,4):
+        allCoor.append(coordOrfFinder(startStopFinder(sequenceRev,i),startStopFinder(sequenceRev,i,codon="stop")))
+        print(coordOrfFinder(startStopFinder(sequenceRev,i),startStopFinder(sequenceRev,i,codon="stop")))
+
+    return allCoor
 
 
 
 
-def display(S1coor,S2coor,S3coor,sequence):
-    allStrandCoor = [S1coor,S2coor,S3coor]
+
+def display(S1coor,S2coor,S3coor,sequence,S4coor,S5coor,S6coor):
+    allPosStrandCoor = [S1coor,S2coor,S3coor]
+    allNegStrandCoor = [S4coor,S5coor,S6coor]
     seqLine = ""
-    for strandCoor in allStrandCoor:
+    for strandCoor in allPosStrandCoor:
         for j in range(len(sequence)):
             done = False
             for coor in strandCoor:
-                if coor[0] < j < coor[1] and done == False:
+                if coor[0] <= j <= coor[1]+2 and done == False:
                     seqLine = seqLine + sequence[j]
                     done = True
                 elif done == False:
@@ -23,8 +37,21 @@ def display(S1coor,S2coor,S3coor,sequence):
                     done = True
         print(seqLine)
         seqLine = ""
-
     print(sequence)
+    # for strandCoor in allNegStrandCoor:
+    #     for j in range(len(sequence)):
+    #         done = False
+    #         for coor in strandCoor:
+    #             if coor[0] <= j <= coor[1]+2 and done == False:
+    #                 seqLine = seqLine + sequence[j]
+    #                 done = True
+    #             elif done == False:
+    #                 seqLine = seqLine + "-"
+    #                 done = True
+    #     print(seqLine)
+    #     seqLine = ""
+
+
 
 
 
