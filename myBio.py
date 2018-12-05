@@ -9,11 +9,11 @@ def getAllOrfCoor(sequenceDic,sequenceName): #retourne une liste de listes de co
     sequence = sequenceDic[sequenceName]             #au format [S+1,S+2,S+3,S-1,S-2,S-3] (S = strand)
     sequenceRev = Anti_sens(sequenceDic,sequenceName)
     for i in range(1,4): #pour les 3 ORF des brins positifs
-        print(coordOrfFinder(startStopFinder(sequence,i),startStopFinder(sequence,i,codon="stop")))
+
         allCoor.append(coordOrfFinder(startStopFinder(sequence,i),startStopFinder(sequence,i,codon="stop")))
     for i in range(1,4):
         allCoor.append(coordOrfFinder(startStopFinder(sequenceRev,i),startStopFinder(sequenceRev,i,codon="stop")))
-        print(coordOrfFinder(startStopFinder(sequenceRev,i),startStopFinder(sequenceRev,i,codon="stop")))
+
 
     return allCoor
 
@@ -66,11 +66,15 @@ def coorToSequence(coor,sequence):
 
 def orfFilter(orfCoorList,sequence,minLength = 10,maxLength = 1500):
     orfCoorFiltered = []
-    for coor in range(len(orfCoorList)):
-        if minLength < orfCoorList[coor][1]-orfCoorList[coor][0] < maxLength:
-            orfCoorFiltered.append(orfCoorList[coor])
+    allOrfCoorFiltered =[]
+    for list in orfCoorList:
+        orfCoorFiltered = []
+        for coor in list:
+            if minLength < coor[1]-coor[0] < maxLength:
+                orfCoorFiltered.append(coor)
+        allOrfCoorFiltered.append(orfCoorFiltered)
 
-    return orfCoorFiltered
+    return allOrfCoorFiltered
 
 
 def coordOrfFinder(startPos,stopPos):

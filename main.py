@@ -3,6 +3,8 @@ from myBio import *
 
 dicoSequence = readFasta("humaMitoGenome(Short)")
 
-# #display(posStrand1orfCoor,posStrand2orfCoor,posStrand3orfCoor,seqTest,negStrand1orfCoor,negStrand2orfCoor,negStrand3orfCoor)
+orf = getAllOrfCoor(dicoSequence,">NC_012920.1 Homo sapiens mitochondrion, complete genome")
+print(orf)
 
-getAllOrfCoor(dicoSequence,">NC_012920.1 Homo sapiens mitochondrion, complete genome")
+orfFiltered = orfFilter(orf,dicoSequence[">NC_012920.1 Homo sapiens mitochondrion, complete genome"],50,200)
+print("FILTER \n",orfFiltered)
