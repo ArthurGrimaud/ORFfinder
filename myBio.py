@@ -3,6 +3,8 @@
 #jeremy bulle / arthur grimaud
 #Librairie pour creation du programme ORF finder
 
+import tkinter.filedialog as tkFileDialog
+from tkinter import *
 
 allCoor = []
 allOrfDict = []
@@ -81,6 +83,52 @@ def writeInCsv(allCoorF,fileName):
     fichier.close()
 
     return allOrfDict
+
+def getLengths(allCoor):
+    orfLength =[]
+    orfPos=[]
+    for frame in allCoor:
+        for coor in frame:
+            orfLength.append(coor[1]-coor[0])
+            orfPos.append(coor)
+    return (orfLength,orfPos)
+
+def getReadingFrame(allCoor,seqCoor):
+    for frame in range(len(allCoor)):
+        for pos in allCoor[frame]:
+            if seqCoor == pos:
+                if 0<=frame<=2:
+                    return frame+1
+                else:
+                    return int((frame-2)/-1)
+
+def getLongestORF(allCoor,sequence):
+    seqCoor = getLengths(allCoor)[1][getLengths(allCoor)[0].index(min(getLengths(allCoor)[0]))]
+
+    sequenceDisplay = Tk()
+
+    seqStart= Label(sequenceDisplay,text="Start Position :  "+str(seqCoor[0]))
+    seqStart.pack()
+    seqStop= Label(sequenceDisplay,text="Stop Position :  "+str(seqCoor[1]))
+    seqStop.pack()
+    seqStop= Label(sequenceDisplay,text="Frame :  "+str(getReadingFrame(allCoor,seqCoor)))
+    seqStop.pack()
+    seqLength= Label(sequenceDisplay,text="length :  "+str(seqCoor[1]-seqCoor[0])+" bp")
+    seqLength.pack()
+
+    if getReadingFrame(allCoor,seqCoor) >0:
+        seqDNA = Label(sequenceDisplay,text=coorToSequence(seqCoor,sequence))
+        seqDNA.pack()
+        seqAA= Label(sequenceDisplay,text=translate(coorToSequence(seqCoor,sequence),convertGeneticTableFile("geneticCode")))
+        seqAA.pack()
+    else:
+        seqDNA = Label(sequenceDisplay,text=coorToSequence(seqCoor,Anti_sens_withSequence(sequence)))
+        seqDNA.pack()
+        seqAA= Label(sequenceDisplay,text=translate(coorToSequence(seqCoor,Anti_sens_withSequence(sequence)),convertGeneticTableFile("geneticCode")))
+        seqAA.pack()
+
+    sequenceDisplay.mainloop()
+
 
 
 

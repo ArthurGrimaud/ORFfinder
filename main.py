@@ -7,6 +7,7 @@ allCoor = []
 allCoorF=[]
 sequence = ""
 dicoSeq ={}
+
 ###################################################################################
 
 
@@ -43,14 +44,6 @@ def printFilteredCoor(allCoor,min,max,listCoorF):
 
 
 
-def getReadingFrame(allCoor,seqCoor):
-    for frame in range(len(allCoor)):
-        for pos in allCoor[frame]:
-            if seqCoor == pos:
-                if 0<=frame<=2:
-                    return frame+1
-                else:
-                    return int((frame-2)/-1)
 
 def displaySelectedOrf(listCoorF,sequence,allCoorF):
     seqCoor = listCoorF.get(listCoorF.curselection())
@@ -98,8 +91,11 @@ selectSeq.grid(row=0,column=2)
 selectSeq = Button(window, text="Display(4)", command=lambda : displaySelectedOrf(listCoorF,sequence,allCoorF),bg="firebrick3")
 selectSeq.grid(row=0,column=3)
 
-selectSeq = Button(window, text="Store ORF in .cvs (4)", command=lambda : writeInCsv(allCoorF,fileName) ,bg="firebrick3")
+selectSeq = Button(window, text="Store ORF in .csv", command=lambda : writeInCsv(allCoorF,fileName) ,bg="firebrick3")
 selectSeq.grid(row=0,column=4)
+
+selectSeq = Button(window, text="Get longest ORF", command=lambda : getLongestORF(allCoorF,sequence) ,bg="firebrick3")
+selectSeq.grid(row=3,column=4)
 
 labelmax = Label( window,text="Max Length (Nucleotides):",background="yellow")
 labelmax.grid(row=3,column=1)
