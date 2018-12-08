@@ -2,7 +2,10 @@
 #Projet OBI 12/18
 #jeremy bulle / arthur grimaud
 #Librairie pour creation du programme ORF finder
+
+
 allCoor = []
+allOrfDict = []
 
 def getAllOrfCoor(sequenceDic,sequenceName): #retourne une liste de listes de coordonnées
     global allCoor
@@ -17,26 +20,26 @@ def getAllOrfCoor(sequenceDic,sequenceName): #retourne une liste de listes de co
 
 
 
-
-def display(S1coor,S2coor,S3coor,sequence,S4coor,S5coor,S6coor):
-    allPosStrandCoor = [S1coor,S2coor,S3coor]
-    allNegStrandCoor = [S4coor,S5coor,S6coor]
-    seqLine = ""
-    for strandCoor in allPosStrandCoor:
-        for j in range(len(sequence)):
-            done = False
-            for coor in strandCoor:
-                if coor[0] <= j <= coor[1]+2 and done == False:
-                    seqLine = seqLine + sequence[j]
-                    done = True
-                elif done == False:
-                    seqLine = seqLine + "-"
-                    done = True
-        print(seqLine)
-        seqLine = ""
-    print(sequence)
-    # for strandCoor in allNegStrandCoor:
-    #     for j in range(len(sequence)):
+#
+# def display(S1coor,S2coor,S3coor,sequence,S4coor,S5coor,S6coor):
+#     allPosStrandCoor = [S1coor,S2coor,S3coor]
+#     allNegStrandCoor = [S4coor,S5coor,S6coor]
+#     seqLine = ""
+#     for strandCoor in allPosStrandCoor:
+#         for j in range(len(sequence)):
+#             done = False
+#             for coor in strandCoor:
+#                 if coor[0] <= j <= coor[1]+2 and done == False:
+#                     seqLine = seqLine + sequence[j]
+#                     done = True
+#                 elif done == False:
+#                     seqLine = seqLine + "-"
+#                     done = True
+#         print(seqLine)
+#         seqLine = ""
+#     print(sequence)
+#     # for strandCoor in allNegStrandCoor:
+#     #     for j in range(len(sequence)):
     #         done = False
     #         for coor in strandCoor:
     #             if coor[0] <= j <= coor[1]+2 and done == False:
@@ -50,6 +53,36 @@ def display(S1coor,S2coor,S3coor,sequence,S4coor,S5coor,S6coor):
 
 
 
+def writeInCsv(allCoorF,fileName):
+    allOrfDict = []
+    number = 0
+    for frame in allCoorF:
+        for coor in frame:
+            number += 1
+            oneOrfDic = {}
+            oneOrfDic["id"]=number
+            oneOrfDic["start"]=coor[0]
+            oneOrfDic["stop"]=coor[1]
+            oneOrfDic["name"]="unknow"
+            allOrfDict.append(oneOrfDic)
+    print(allOrfDict)
+
+    file = str(fileName.get())
+    fichier = open(file, "a")
+
+    for i in allOrfDict:
+        for key in i.keys():
+            fichier.write(key+";")
+        fichier.write("\n")
+        for key in i.keys():
+            fichier.write(str(i[key])+";")
+        fichier.write("\n")
+
+    fichier.close()
+
+    return allOrfDict
+
+
 
 
 def coorToSequence(coor,sequence):
@@ -57,8 +90,6 @@ def coorToSequence(coor,sequence):
     for n in range(coor[0],coor[1]+3):
         seqGene = seqGene + sequence[n]
     return seqGene
-
-
 
 
 def orfFilter(orfCoorList,sequence,minLength = 10,maxLength = 1500):
@@ -279,6 +310,23 @@ def Anti_sens(dict_seq,seq_name):
     temp_anti=""
     temp = dict_seq[seq_name]
     temp_anti = temp[::-1]
+    for n in temp_anti :
+        if n == "A" :
+            n = "T"
+        elif n == "T":
+            n = "A"
+        elif n == "G":
+            n = "C"
+        elif n == "C":
+            n = "G"
+        seq_anti = seq_anti + n
+    return seq_anti
+
+def Anti_sens_withSequence(seq):
+    """retourne la seq d origine et la converti en brin anti sens, les sens de lecture es 5-3"""
+    seq_anti = ""
+    temp_anti=""
+    temp_anti = seq[::-1]
     for n in temp_anti :
         if n == "A" :
             n = "T"

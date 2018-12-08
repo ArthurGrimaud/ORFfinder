@@ -10,9 +10,6 @@ dicoSeq ={}
 ###################################################################################
 
 
-
-
-
 def selectFile(window,listbox):
     global dicoSeq
     currdir = os.getcwd()
@@ -44,47 +41,82 @@ def printFilteredCoor(allCoor,min,max,listCoorF):
         for j in i:
             listCoorF.insert(END, j)
 
-def displaySelectedOrf(listCoorF,sequence):
+
+
+def getReadingFrame(allCoor,seqCoor):
+    for frame in range(len(allCoor)):
+        for pos in allCoor[frame]:
+            if seqCoor == pos:
+                if 0<=frame<=2:
+                    return frame+1
+                else:
+                    return int((frame-2)/-1)
+
+def displaySelectedOrf(listCoorF,sequence,allCoorF):
     seqCoor = listCoorF.get(listCoorF.curselection())
     sequenceDisplay = Tk()
-    seqDNA = Label(sequenceDisplay,text=coorToSequence(seqCoor,sequence))
-    seqDNA.pack()
-    seqAA= Label(sequenceDisplay,text=translate(coorToSequence(seqCoor,sequence),convertGeneticTableFile("geneticCode")))
-    seqAA.pack()
+
+    seqStart= Label(sequenceDisplay,text="Start Position :  "+str(seqCoor[0]))
+    seqStart.pack()
+    seqStop= Label(sequenceDisplay,text="Stop Position :  "+str(seqCoor[1]))
+    seqStop.pack()
+    seqStop= Label(sequenceDisplay,text="Frame :  "+str(getReadingFrame(allCoorF,seqCoor)))
+    seqStop.pack()
+    seqLength= Label(sequenceDisplay,text="length :  "+str(seqCoor[1]-seqCoor[0])+" bp")
+    seqLength.pack()
+
+    if getReadingFrame(allCoorF,seqCoor) >0:
+        seqDNA = Label(sequenceDisplay,text=coorToSequence(seqCoor,sequence))
+        seqDNA.pack()
+        seqAA= Label(sequenceDisplay,text=translate(coorToSequence(seqCoor,sequence),convertGeneticTableFile("geneticCode")))
+        seqAA.pack()
+    else:
+        seqDNA = Label(sequenceDisplay,text=coorToSequence(seqCoor,Anti_sens_withSequence(sequence)))
+        seqDNA.pack()
+        seqAA= Label(sequenceDisplay,text=translate(coorToSequence(seqCoor,Anti_sens_withSequence(sequence)),convertGeneticTableFile("geneticCode")))
+        seqAA.pack()
+
     sequenceDisplay.mainloop()
-
-
 
 
 
 ####################################################################################""
 
 window = Tk()
+window.configure(background='grey')
 
 
-select = Button(window, text="Selectionner un fichier fasta (1)", command=lambda : selectFile(window,listbox))
-select.grid(row=0,column=0)
+select = Button(window, text="Select fasta file (1)", command=lambda : selectFile(window,listbox),bg="firebrick3")
+select.grid(row=1,column=0)
 
-viewCoor = Button(window, text="Find ORF(2)", command=lambda : printCoor(listbox,dicoSeq,window,listCoor))
+viewCoor = Button(window, text="Find ORF(2)", command=lambda : printCoor(listbox,dicoSeq,window,listCoor),bg="firebrick3")
 viewCoor.grid(row=0,column=1)
 
-selectSeq = Button(window, text="Filter ORF(3)", command=lambda : printFilteredCoor(allCoor,min,max,listCoorF))
+selectSeq = Button(window, text="Filter ORF(3)", command=lambda : printFilteredCoor(allCoor,min,max,listCoorF),bg="firebrick3")
 selectSeq.grid(row=0,column=2)
 
-selectSeq = Button(window, text="Display", command=lambda : displaySelectedOrf(listCoorF,sequence))
+selectSeq = Button(window, text="Display(4)", command=lambda : displaySelectedOrf(listCoorF,sequence,allCoorF),bg="firebrick3")
 selectSeq.grid(row=0,column=3)
 
-labelmax = Label( window,text="Max")
+selectSeq = Button(window, text="Store ORF in .cvs (4)", command=lambda : writeInCsv(allCoorF,fileName) ,bg="firebrick3")
+selectSeq.grid(row=0,column=4)
+
+labelmax = Label( window,text="Max Length (Nucleotides):",background="yellow")
 labelmax.grid(row=3,column=1)
-labelmin = Label( window,text="Min")
+labelmin = Label( window,text="Min Length (Nucleotides):",background="orange")
 labelmin.grid(row=2,column=1)
 
-max = Entry( window)
+max = Entry( window,background="yellow")
 max.insert(END, '100000000')
 max.grid(row=3,column=2)
-min = Entry( window)
+
+min = Entry( window,background="orange")
 min.insert(END, '0')
 min.grid(row=2,column=2)
+
+fileName = Entry( window,background="green")
+fileName.insert(END, "ORF")
+fileName.grid(row=1,column=4)
 
 listbox = Listbox(window)
 listbox.grid(row=1,column=1)
