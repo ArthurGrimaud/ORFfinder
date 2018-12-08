@@ -2,18 +2,16 @@
 #Projet OBI 12/18
 #jeremy bulle / arthur grimaud
 #Librairie pour creation du programme ORF finder
-
+allCoor = []
 
 def getAllOrfCoor(sequenceDic,sequenceName): #retourne une liste de listes de coordonnées
-    allCoor = []
+    global allCoor
     sequence = sequenceDic[sequenceName]             #au format [S+1,S+2,S+3,S-1,S-2,S-3] (S = strand)
     sequenceRev = Anti_sens(sequenceDic,sequenceName)
     for i in range(1,4): #pour les 3 ORF des brins positifs
         allCoor.append(coordOrfFinder(startStopFinder(sequence,i),startStopFinder(sequence,i,codon="stop")))
     for i in range(1,4):
         allCoor.append(coordOrfFinder(startStopFinder(sequenceRev,i),startStopFinder(sequenceRev,i,codon="stop")))
-
-
     return allCoor
 
 
@@ -64,6 +62,7 @@ def coorToSequence(coor,sequence):
 
 
 def orfFilter(orfCoorList,sequence,minLength = 10,maxLength = 1500):
+    print(orfCoorList)
     orfCoorFiltered = []
     allOrfCoorFiltered =[]
     for list in orfCoorList:
@@ -72,7 +71,7 @@ def orfFilter(orfCoorList,sequence,minLength = 10,maxLength = 1500):
             if minLength < coor[1]-coor[0] < maxLength:
                 orfCoorFiltered.append(coor)
         allOrfCoorFiltered.append(orfCoorFiltered)
-
+    print(allOrfCoorFiltered)
     return allOrfCoorFiltered
 
 
@@ -291,9 +290,3 @@ def Anti_sens(dict_seq,seq_name):
             n = "G"
         seq_anti = seq_anti + n
     return seq_anti
-
-
-if __name__ == '__main__':
-
-    test = "AATAACTT"
-    Count_word(test,"AA")
