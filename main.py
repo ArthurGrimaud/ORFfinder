@@ -4,9 +4,9 @@ import os
 from myBio import*
 
 allCoor = []
-allCoorF=[]
+allCoorF= []
 sequence = ""
-dicoSeq ={}
+dicoSeq = {}
 
 ###################################################################################
 
@@ -41,9 +41,6 @@ def printFilteredCoor(allCoor,min,max,listCoorF):
     for i in allCoorF:
         for j in i:
             listCoorF.insert(END, j)
-
-
-
 
 def displaySelectedOrf(listCoorF,sequence,allCoorF):
     seqCoor = listCoorF.get(listCoorF.curselection())
@@ -96,6 +93,10 @@ selectSeq.grid(row=0,column=4)
 
 selectSeq = Button(window, text="Get longest ORF", command=lambda : getLongestORF(allCoorF,sequence) ,bg="firebrick3")
 selectSeq.grid(row=3,column=4)
+
+selectSeq = Button(window, text="compare to NCBI", command=lambda : compare(readNCBIFeatures(window),writeInCsv(allCoorF,fileName)) ,bg="firebrick3")
+selectSeq.grid(row=4,column=4)
+
 
 labelmax = Label( window,text="Max Length (Nucleotides):",background="yellow")
 labelmax.grid(row=3,column=1)

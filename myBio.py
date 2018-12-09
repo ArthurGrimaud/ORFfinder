@@ -5,11 +5,17 @@
 
 import tkinter.filedialog as tkFileDialog
 from tkinter import *
+import os
 
 allCoor = []
 allOrfDict = []
 
-def getAllOrfCoor(sequenceDic,sequenceName): #retourne une liste de listes de coordonnées
+def getAllOrfCoor(sequenceDic,sequenceName):
+    """retourne une liste de listes de coordonnées pour chaques orfFilter
+    arg:
+    SequenceDic : dictionnaire de sequenceDic
+    sequenceName : clef de la sequence
+    """
     global allCoor
     sequence = sequenceDic[sequenceName]             #au format [S+1,S+2,S+3,S-1,S-2,S-3] (S = strand)
     sequenceRev = Anti_sens(sequenceDic,sequenceName)
@@ -20,40 +26,50 @@ def getAllOrfCoor(sequenceDic,sequenceName): #retourne une liste de listes de co
     return allCoor
 
 
+def readNCBIFeatures(window):
+    """
+    Prend en argument un fichier ncbi FEATURES et renvoie une liste dictionaires
+    au format [{id:,start:,stop;,name:}]
 
-# def display(S1coor,S2coor,S3coor,sequence,S4coor,S5coor,S6coor):
-#     allPosStrandCoor = [S1coor,S2coor,S3coor]
-#     allNegStrandCoor = [S4coor,S5coor,S6coor]
-#     seqLine = ""
-#     for strandCoor in allPosStrandCoor:
-#         for j in range(len(sequence)):
-#             done = False
-#             for coor in strandCoor:
-#                 if coor[0] <= j <= coor[1]+2 and done == False:
-#                     seqLine = seqLine + sequence[j]
-#                     done = True
-#                 elif done == False:
-#                     seqLine = seqLine + "-"
-#                     done = True
-#         print(seqLine)
-#         seqLine = ""
-#     print(sequence)
-#     # for strandCoor in allNegStrandCoor:
-#     #     for j in range(len(sequence)):
-    #         done = False
-    #         for coor in strandCoor:
-    #             if coor[0] <= j <= coor[1]+2 and done == False:
-    #                 seqLine = seqLine + sequence[j]
-    #                 done = True
-    #             elif done == False:
-    #                 seqLine = seqLine + "-"
-    #                 done = True
-    #     print(seqLine)
-    #     seqLine = ""
+    arg: window : pour ouvrir la fenetre de selection de fichier
+    """
+    listDic = []
+    dico = {}
+    currdir = os.getcwd()
+    tempdir = tkFileDialog.askopenfilename(parent=window, initialdir=currdir, title='Please select a directory')
+    if len(tempdir) > 0:
+        file = tempdir
+
+    fastaSeq = []
+
+    file=open(file,"r")
+    for line in file:
+        if ">" in line:
+            splited = line.split(":")
+            dico["id"] = splited[0].split("|")[1]
+            dico["start"] = int(splited[1])
+            dico["stop"] = int(splited[2].split(" ")[0])
+            listDic.append(dico)
+    print("NNNNNCCCCCCCCCCCBBBBBBBIIIIIIIIII",listDic)
+    return listDic
+
+def compare(orf1,orf2):
+    for o1 in orf1:
+        for o2 in orf2:
+            if o2["start"]-10 <= o1["start"] <= o2["start"]+10:
+                print("------------------Identique--------------")
+
 
 
 
 def writeInCsv(allCoorF,fileName):
+    """
+    arg:allCoorF : les coordonnées des orfFilter
+        fileName : le nom du fichier crée
+
+    return:la liste des dictionaires avec les données des ORF
+
+    """
     allOrfDict = []
     number = 0
     for frame in allCoorF:
@@ -65,7 +81,6 @@ def writeInCsv(allCoorF,fileName):
             oneOrfDic["stop"]=coor[1]
             oneOrfDic["name"]="unknow"
             allOrfDict.append(oneOrfDic)
-    print(allOrfDict)
 
     file = str(fileName.get())
     fichier = open(file, "a")
@@ -79,10 +94,14 @@ def writeInCsv(allCoorF,fileName):
         fichier.write("\n")
 
     fichier.close()
-
+    print("FFFFIIILLLTTEERRED,=",allOrfDict)
     return allOrfDict
 
 def getLengths(allCoor):
+    """
+    Prend en argument les coordonnées des ORF et retourne
+    une liste de la taille de ses orf avec leur positions associés
+    """
     orfLength =[]
     orfPos=[]
     for frame in allCoor:
@@ -94,6 +113,10 @@ def getLengths(allCoor):
     return (orfLength,orfPos)
 
 def getReadingFrame(allCoor,seqCoor):
+    """
+    Retourne le cadre de lecture d'un ORF en fonction de ses coordonnées
+    et de la liste de coordonnées dont il est issue
+    """
     for frame in range(len(allCoor)):
         for pos in allCoor[frame]:
             if seqCoor == pos:
@@ -103,6 +126,10 @@ def getReadingFrame(allCoor,seqCoor):
                     return int((frame-2)/-1)
 
 def getLongestORF(allCoor,sequence):
+    """
+    Affiche dans une fenetre tkInter
+    le plus long orf de la liste de longueur d'orf
+    """
     seqCoor = getLengths(allCoor)[1][getLengths(allCoor)[0].index(max(getLengths(allCoor)[0]))]
     sequenceDisplay = Tk()
 
@@ -129,12 +156,9 @@ def getLongestORF(allCoor,sequence):
     sequenceDisplay.mainloop()
 
 
-
-
-
 def coorToSequence(coor,sequence):
     seqGene = ""
-    for n in range(coor[0],coor[1]+3):
+    for n in range(coor[0],coor[1]+6):
         seqGene = seqGene + sequence[n]
     return seqGene
 
@@ -154,6 +178,12 @@ def orfFilter(orfCoorList,sequence,minLength = 10,maxLength = 1500):
 
 
 def coordOrfFinder(startPos,stopPos):
+    """Retourne une liste de coordonnées des orf en fonction des position des
+    codons start et stop
+    arg : startPos : liste des positions des codons start
+          stopPos : liste des positions des condons stop
+    return : liste de tuple des coordonnées
+    """
     orfCoor = []
     for start in startPos:
         oneCoor = ()
@@ -164,7 +194,6 @@ def coordOrfFinder(startPos,stopPos):
                 orfCoor.append(oneCoor)
                 found = True
     return orfCoor
-
 
 
 def startStopFinder(seq, readingFrame=1, codon = "start" ):
@@ -215,7 +244,11 @@ def Write_fasta(Dict_seq,seq,filename,x=2):
 
 
 
+
 def convertGeneticTableFile(file):
+    """
+    converti une table de code genetique au format ncbi au format .txt en listes python
+    """
     geneticCodeTable =[]
     file=open(file,"r")
     for line in file:
@@ -228,6 +261,13 @@ def convertGeneticTableFile(file):
 
 
 def translate(seq,geneticTable):
+    """
+    Pour chaques codons d'une sequence, determine l'acide aminée correspondant et retourne
+    la sequence peptidique
+
+    arg: seq : sequence à traduire
+         geneticTable : code genetique utilisé pour la traduction
+    """
     aaSeq =""
     interAA1 =[]
     interAA2 =[]
@@ -249,50 +289,6 @@ def translate(seq,geneticTable):
 
     return aaSeq
 
-# def enter_seq():
-#     adn = input("Entrez␣la␣chaine␣:␣")
-#     for i in range (len(adn) ):
-#         print("i:␣", i, "->" , adn[i])
-
-# def Compte_aa(seq_prot):
-#     """compte le nombre d'apparition d'un AA donné dans la séquence d'une prot"""
-#     print("quel AA?")
-#     aa = input()
-#     nb_aa = 0
-#     aa = aa.upper()
-#     for i in seq_prot:
-#         if i == aa :
-#             nb_aa = nb_aa + 1
-#     return nb_aa
-#     print ("il␣y␣a␣" , Compte_aa(protein) , "␣Cysteine(s)")
-
-# def Compte_all_aa(seq_prot):
-#     "affiche le nombre d'apparition de chaque AA dans une seq prot"
-#     List_aa =["E","D","A","R","N","C","Q","G","H","I","L","K","M","F","P","S","T","W","Y","V"]
-#     for i in List_aa :
-#         Nb_aa = 0
-#         for j in seq_prot:
-#             if i == j:
-#                 Nb_aa = Nb_aa +1
-#         print(i ,"->", Nb_aa)
-
-
-# def Is_dna(adn):
-#     """retourne tru si la sequence entree est une sequence d adn """
-#     seq = ""
-#     for i in adn:
-#         i = i.upper()
-#         seq = seq + i
-#     flag = 0
-#     for i in seq :
-#         if i=="A" or i=="T" or i=="G" or i=="C":
-#             flag = flag
-#         else :
-#             flag = flag +1
-#     if flag > 0 :
-#         return False
-#     else :
-#         return True
 
 def One_word(seq, start,wlen):
     """seq est une string entrée, start est l'index de départ du mot
@@ -311,19 +307,6 @@ def One_word(seq, start,wlen):
             return s
     return s
 
-# def Count_word(seq, word):
-#     """ seq est une string entrée, word est une string qui est recherchéen dans
-#     la seq
-#     Count_word retourne le nombre d'occurence de word dans la séquence et dans
-#     tous les cadres de lecture"""
-#     word = word.upper()
-#     wlen = len(word)
-#     flag = 0
-#     for i in range(len(seq)):
-#         Codon = One_word(seq,i,wlen)
-#         if Codon == word :
-#             flag = flag +1
-#     print(word, "est présent", flag, "fois dans la séquence")
 
 def Is_codon_start(seq,pos):
     seq = seq.upper()
