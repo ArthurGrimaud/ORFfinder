@@ -93,7 +93,7 @@ selectSeq.grid(row=0,column=4)
 selectSeq = Button(window, text="Get longest ORF", command=lambda : getLongestORF(allCoorF,sequence) ,bg="firebrick3")
 selectSeq.grid(row=3,column=4)
 
-selectSeq = Button(window, text="compare to NCBI", command=lambda : compare(readNCBIFeatures(window),writeInCsv(allCoorF,fileName)) ,bg="firebrick3")
+selectSeq = Button(window, text="compare to NCBI", command=lambda : compare(readNCBIFeatures(window),writeInCsv(allCoorF,fileName,createCSV=False),window,sequence) ,bg="firebrick3")
 selectSeq.grid(row=4,column=4)
 
 

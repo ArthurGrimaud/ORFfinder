@@ -1,6 +1,6 @@
 # coding: utf-8
 #Projet OBI 12/18
-#jeremy bulle / arthur grimaud
+#Jeremy bulle / Arthur grimaud
 #Librairie pour creation du programme ORF finder
 
 import tkinter.filedialog as tkFileDialog
@@ -17,17 +17,17 @@ def getAllOrfCoor(sequenceDic,sequenceName):
     sequenceName : clef de la sequence
     """
     global allCoor
-    sequence = sequenceDic[sequenceName]             #au format [S+1,S+2,S+3,S-1,S-2,S-3] (S = strand)
+    sequence = sequenceDic[sequenceName] #au format [S+1,S+2,S+3,S-1,S-2,S-3] (S = strand)
     sequenceRev = Anti_sens(sequenceDic,sequenceName)
-    for i in range(1,4): #pour les 3 ORF des brins positifs
+    for i in range(4): #pour les 3 ORF des brins positifs
         allCoor.append(coordOrfFinder(startStopFinder(sequence,i),startStopFinder(sequence,i,codon="stop")))
-    for i in range(1,4):
+    for i in range(4):
         allCoor.append(coordOrfFinder(startStopFinder(sequenceRev,i),startStopFinder(sequenceRev,i,codon="stop")))
     return allCoor
 
 def readNCBIFeatures(window):
     """
-    Prend en argument un fichier ncbi FEATURES et renvoie une liste dictionaires
+    Prend en argument un fichier ncbi "FEATURES" et renvoie une liste dictionaires
     au format [{id:,start:,stop;,name:}]
 
     arg: window : pour ouvrir la fenetre de selection de fichier
@@ -48,40 +48,52 @@ def readNCBIFeatures(window):
             splited = line.split(":")
             dico["id"] = splited[0].split("|")[1]
             dico["start"] = int(splited[1])
-            print("SPPPPPLLIIIIITEEEDDDDD",int(splited[1]))
             dico["stop"] = int(splited[2].split(" ")[0])
             listDic.append(dico)
+    print(listDic)
     return listDic
 
-def compare(orf1,orf2):
+def compare(orf1,orf2,window,sequence):
+    """compare deux jeux de coordonées et identifie les coordonées identiques
+    l'identifiant correspondant au coordonnées identiques est affichée dans une listBox tkInter
 
-    start1= []
-    start2= []
-    inter=[]
+    arg: orf1 et orf2 : données au format [{id:AAA,start:BBB,stop;CCC,name:DDD},{...},...]
+         window : fenetre Tkinter parent
+         sequence : sequence dont sont issue les coordonnées des ORF
+    """
+    simi=Tk()
 
-    for o1 in orf1:
-        start1.append(int(o1["start"]))
-    for o2 in orf2:
-        start2.append(int(o2["start"]))
+    listsimi = Listbox(simi)
+    listsimi.pack()
+    labelmax = Label(simi,text="The following NCBI ORF has been found",background="yellow")
+    labelmax.pack()
 
     for o1 in orf1:
         for o2 in orf2:
-            if int(o1["start"]) == int(o2["start"]) and  int(o1["stop"]) == int(o2["stop"]):
-                print("!!!!!!!!!!!!!!!!!!!!SAME!!!!!!!!!!!!!!!!!!!!!!!")
+
+            invposstart = len(sequence) - int(o1["start"]) # les positions sur NCBI sont notée sur le brin complementaire
+            invposstart += 1                               #alors que dans le programme elles sont sur le brin inverse complementaire.
+            invposstop = len(sequence) - int(o1["stop"])   #les coordonnées sont donc "inversées" pour les rendres comparable à celles de NCBI
+            invposstop += 1
+
+            print (len(sequence))
+            len(sequence) - int(o1["stop"])
+            if int(o1["start"]) == int(o2["start"]) and int(o1["stop"]) == int(o2["stop"]):
+                ID = str(o1["id"])
+                listsimi.insert(END, ID)
+            if invposstart == int(o2["start"]) and invposstop == int(o2["stop"]):
+                ID = str(o1["id"])
+                listsimi.insert(END, ID)
+
+    simi.mainloop()
 
 
-    print(start1)
-    print(start2)
-    inter = list(set(start1).intersection(start2))
-    print(inter)
-
-
-def writeInCsv(allCoorF,fileName):
+def writeInCsv(allCoorF,fileName,createCSV=True):
     """
-    arg:allCoorF : les coordonnées des orfFilter
+    arg: allCoorF : les coordonnées des orfFilter
         fileName : le nom du fichier crée
 
-    return:la liste des dictionaires avec les données des ORF
+    return: la liste des dictionaires avec les données des ORF
 
     """
     allOrfDict = []
@@ -96,18 +108,19 @@ def writeInCsv(allCoorF,fileName):
             oneOrfDic["name"]="unknow"
             allOrfDict.append(oneOrfDic)
 
-    file = str(fileName.get())
-    fichier = open(file, "a")
+    if createCSV:
+        file = str(fileName.get())
+        fichier = open(file, "a")
 
-    for i in allOrfDict:
-        for key in i.keys():
-            fichier.write(key+";")
-        fichier.write("\n")
-        for key in i.keys():
-            fichier.write(str(i[key])+";")
-        fichier.write("\n")
+        for i in allOrfDict:
+            for key in i.keys():
+                fichier.write(key+";")
+            fichier.write("\n")
+            for key in i.keys():
+                fichier.write(str(i[key])+";")
+            fichier.write("\n")
 
-    fichier.close()
+        fichier.close()
     return allOrfDict
 
 def getLengths(allCoor):
@@ -169,13 +182,16 @@ def getLongestORF(allCoor,sequence):
     sequenceDisplay.mainloop()
 
 def coorToSequence(coor,sequence):
+    """Permet d'obtenir la sequence de nucleotide correspondante aux coordonnées d'un ORF
+    """
     seqGene = ""
-    for n in range(coor[0]-1,coor[1]):
+    for n in range(coor[0]-1,coor[1]+3):
         seqGene = seqGene + sequence[n]
     return seqGene
 
 def orfFilter(orfCoorList,sequence,minLength = 10,maxLength = 1500):
-    print(orfCoorList)
+    """Crée une nouvelle liste d'ORF filtée suivant une taille max et min à partir d'une liste de coordonnées d'ORF
+    """
     orfCoorFiltered = []
     allOrfCoorFiltered =[]
     for list in orfCoorList:
@@ -184,7 +200,7 @@ def orfFilter(orfCoorList,sequence,minLength = 10,maxLength = 1500):
             if minLength < coor[1]-coor[0] < maxLength:
                 orfCoorFiltered.append(coor)
         allOrfCoorFiltered.append(orfCoorFiltered)
-    print(allOrfCoorFiltered)
+
     return allOrfCoorFiltered
 
 def coordOrfFinder(startPos,stopPos):
@@ -206,6 +222,11 @@ def coordOrfFinder(startPos,stopPos):
     return orfCoor
 
 def startStopFinder(seq, readingFrame=1, codon = "start" ):
+    """Pour un cadre de lecture donnée renvoie la liste des coordonnées des codons Start ou Stop
+        arg : seq: sequence ADN
+              readingframe : cadre de lecture pris en compte (1 par default)
+              codon: codons recherchés (start ou stop)
+    """
     strandCodon=[]
     if codon == "start":
         for pos in range(readingFrame,len(seq),3):
@@ -315,6 +336,8 @@ def One_word(seq, start,wlen):
 
 
 def Is_codon_start(seq,pos):
+    """retourne TRUE si le codon correspond a un codon start
+    """
     seq = seq.upper()
     Codon = One_word(seq,pos,3)
     if Codon == "ATG" :
@@ -323,14 +346,16 @@ def Is_codon_start(seq,pos):
         return False
 
 def Is_codon_stop(seq,pos):
-        seq = seq.upper()
-        Codon = One_word(seq,pos,3)
-        if Codon=="TAA" or Codon=="TAG" or Codon=="AGA" or Codon == "AGG":
-            return True
-        else :
-            return False
+    """retourne TRUE si le codon correspond a un codon stop"""
+    seq = seq.upper()
+    Codon = One_word(seq,pos,3)
+    if Codon=="TAA" or Codon=="TAG" or Codon=="AGA" or Codon == "AGG":
+        return True
+    else :
+        return False
 
 def Is_gene(seq):
+    """lecture donnée renvoie la liste des coordonnées des codons Start ou Stop"""
     for i in range(len(seq)):
         if Is_codon_start(seq,i)==True:
             new_seq = seq[i:len(seq)]
