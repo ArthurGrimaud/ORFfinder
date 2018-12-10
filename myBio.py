@@ -19,9 +19,9 @@ def getAllOrfCoor(sequenceDic,sequenceName):
     global allCoor
     sequence = sequenceDic[sequenceName] #au format [S+1,S+2,S+3,S-1,S-2,S-3] (S = strand)
     sequenceRev = Anti_sens(sequenceDic,sequenceName)
-    for i in range(4): #pour les 3 ORF des brins positifs
+    for i in range(3): #pour les 3 ORF des brins positifs
         allCoor.append(coordOrfFinder(startStopFinder(sequence,i),startStopFinder(sequence,i,codon="stop")))
-    for i in range(4):
+    for i in range(3):
         allCoor.append(coordOrfFinder(startStopFinder(sequenceRev,i),startStopFinder(sequenceRev,i,codon="stop")))
     return allCoor
 
@@ -63,14 +63,18 @@ def compare(orf1,orf2,window,sequence):
     """
     simi=Tk()
 
-    listsimi = Listbox(simi)
-    listsimi.pack()
     labelmax = Label(simi,text="The following NCBI ORF has been found",background="yellow")
     labelmax.pack()
+    listsimi = Listbox(simi)
+    listsimi.pack()
 
+    nNCBI=0
+    identical =0
     for o1 in orf1:
+        nNCBI += 1
+        nPerso=0
         for o2 in orf2:
-
+            nPerso +=1
             invposstart = len(sequence) - int(o1["start"]) # les positions sur NCBI sont notée sur le brin complementaire
             invposstart += 1                               #alors que dans le programme elles sont sur le brin inverse complementaire.
             invposstop = len(sequence) - int(o1["stop"])   #les coordonnées sont donc "inversées" pour les rendres comparable à celles de NCBI
@@ -79,13 +83,28 @@ def compare(orf1,orf2,window,sequence):
             print (len(sequence))
             len(sequence) - int(o1["stop"])
             if int(o1["start"]) == int(o2["start"]) and int(o1["stop"]) == int(o2["stop"]):
+                identical += 1
                 ID = str(o1["id"])
                 listsimi.insert(END, ID)
             if invposstart == int(o2["start"]) and invposstop == int(o2["stop"]):
+                identical += 1
                 ID = str(o1["id"])
                 listsimi.insert(END, ID)
 
+            strncbi = "Nombre d'ORF NCBI : "  +str(nNCBI)
+            strperso = "Nombre d'ORF Trouvés : " +str(nPerso)
+            ident = str(identical) + " sont identiques"
+
+    labelmax = Label(simi,text=strncbi,background="yellow")
+    labelmax.pack()
+    labelmax = Label(simi,text=strperso,background="yellow")
+    labelmax.pack()
+    labelmax = Label(simi,text=ident,background="yellow")
+    labelmax.pack()
+
+
     simi.mainloop()
+
 
 
 def writeInCsv(allCoorF,fileName,createCSV=True):
