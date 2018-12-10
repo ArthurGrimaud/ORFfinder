@@ -10,7 +10,6 @@ dicoSeq = {}
 
 ###################################################################################
 
-
 def selectFile(window,listbox):
     global dicoSeq
     currdir = os.getcwd()
@@ -71,7 +70,7 @@ def displaySelectedOrf(listCoorF,sequence,allCoorF):
 
 
 ####################################################################################""
-
+()
 window = Tk()
 window.configure(background='grey')
 

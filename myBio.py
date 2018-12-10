@@ -25,7 +25,6 @@ def getAllOrfCoor(sequenceDic,sequenceName):
         allCoor.append(coordOrfFinder(startStopFinder(sequenceRev,i),startStopFinder(sequenceRev,i,codon="stop")))
     return allCoor
 
-
 def readNCBIFeatures(window):
     """
     Prend en argument un fichier ncbi FEATURES et renvoie une liste dictionaires
@@ -45,21 +44,36 @@ def readNCBIFeatures(window):
     file=open(file,"r")
     for line in file:
         if ">" in line:
+            dico = {}
             splited = line.split(":")
             dico["id"] = splited[0].split("|")[1]
             dico["start"] = int(splited[1])
+            print("SPPPPPLLIIIIITEEEDDDDD",int(splited[1]))
             dico["stop"] = int(splited[2].split(" ")[0])
             listDic.append(dico)
-    print("NNNNNCCCCCCCCCCCBBBBBBBIIIIIIIIII",listDic)
     return listDic
 
 def compare(orf1,orf2):
+
+    start1= []
+    start2= []
+    inter=[]
+
+    for o1 in orf1:
+        start1.append(int(o1["start"]))
+    for o2 in orf2:
+        start2.append(int(o2["start"]))
+
     for o1 in orf1:
         for o2 in orf2:
-            if o2["start"]-10 <= o1["start"] <= o2["start"]+10:
-                print("------------------Identique--------------")
+            if int(o1["start"]) == int(o2["start"]) and  int(o1["stop"]) == int(o2["stop"]):
+                print("!!!!!!!!!!!!!!!!!!!!SAME!!!!!!!!!!!!!!!!!!!!!!!")
 
 
+    print(start1)
+    print(start2)
+    inter = list(set(start1).intersection(start2))
+    print(inter)
 
 
 def writeInCsv(allCoorF,fileName):
@@ -94,7 +108,6 @@ def writeInCsv(allCoorF,fileName):
         fichier.write("\n")
 
     fichier.close()
-    print("FFFFIIILLLTTEERRED,=",allOrfDict)
     return allOrfDict
 
 def getLengths(allCoor):
@@ -155,13 +168,11 @@ def getLongestORF(allCoor,sequence):
 
     sequenceDisplay.mainloop()
 
-
 def coorToSequence(coor,sequence):
     seqGene = ""
-    for n in range(coor[0],coor[1]+6):
+    for n in range(coor[0]-1,coor[1]):
         seqGene = seqGene + sequence[n]
     return seqGene
-
 
 def orfFilter(orfCoorList,sequence,minLength = 10,maxLength = 1500):
     print(orfCoorList)
@@ -176,7 +187,6 @@ def orfFilter(orfCoorList,sequence,minLength = 10,maxLength = 1500):
     print(allOrfCoorFiltered)
     return allOrfCoorFiltered
 
-
 def coordOrfFinder(startPos,stopPos):
     """Retourne une liste de coordonnées des orf en fonction des position des
     codons start et stop
@@ -190,11 +200,10 @@ def coordOrfFinder(startPos,stopPos):
         found = False
         for stop in stopPos:
             if start < stop and found == False:
-                oneCoor = (start,stop)
+                oneCoor = (start+1,stop+3)
                 orfCoor.append(oneCoor)
                 found = True
     return orfCoor
-
 
 def startStopFinder(seq, readingFrame=1, codon = "start" ):
     strandCodon=[]
@@ -241,9 +250,6 @@ def Write_fasta(Dict_seq,seq,filename,x=2):
         new_contenu = contenu_fic + "\n" + seq + '\n'+ Dict_seq[seq]
     fic.write(new_contenu)
     fic.close()
-
-
-
 
 def convertGeneticTableFile(file):
     """
@@ -319,7 +325,7 @@ def Is_codon_start(seq,pos):
 def Is_codon_stop(seq,pos):
         seq = seq.upper()
         Codon = One_word(seq,pos,3)
-        if Codon=="TAA" or Codon=="TAG" or Codon=="TGA":
+        if Codon=="TAA" or Codon=="TAG" or Codon=="AGA" or Codon == "AGG":
             return True
         else :
             return False
