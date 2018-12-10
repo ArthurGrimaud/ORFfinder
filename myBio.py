@@ -181,6 +181,24 @@ def getLongestORF(allCoor,sequence):
 
     sequenceDisplay.mainloop()
 
+def getTopORF(allCoor,sequence,top):
+    if top > 1 :
+        top = top/100
+    for frame in allCoor :
+        for coord in allCoor[frame]:
+            long = allCoor[frame][1]-allCoor[frame][0] + 1
+            liste_long.append((allCoor[0],allCoor[1],long))
+    liste_long_decr = sorted(liste_long, lambda colonnes: colonnes[2], reverse = True)
+    orf_tot = len(liste_long_decr)
+    nb_target = int(round(top*orf_tot))
+    for nb in (0,nb_target,1):
+        liste_target.append(liste_long_decr[nb])
+
+    return liste_target
+
+
+
+
 def coorToSequence(coor,sequence):
     """Permet d'obtenir la sequence de nucleotide correspondante aux coordonnées d'un ORF
     """
